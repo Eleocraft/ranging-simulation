@@ -1,0 +1,10 @@
+# Godot 4+ specific ignores
+.godot/
+android/
+
+# Rust ignores
+target/
+
+# nix ignores
+.envrc
+.direnv/
