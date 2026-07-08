@@ -4,5 +4,5 @@ compatibility_minimum = "4.1"
 reloadable = true
 
 [libraries]
-linux.debug.x86_64 = "res://rust/target/debug/librangingsim.so"
-linux.release.x86_64 = "res://rust/target/release/librangingsim.so"
+linux.debug.x86_64 = "res://target/debug/libsim.so"
+linux.release.x86_64 = "res://target/release/libsim.so"

@@ -1,0 +1,61 @@
+[gd_scene format=3 uid="uid://g71leu6k3rre"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0mjmx"]
+bg_color = Color(0.33660764, 0.3366076, 0.3366076, 0.32941177)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kcfdb"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2f2x2"]
+bg_color = Color(0.34032893, 0.57218647, 0.82889897, 0.72156864)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o55sl"]
+bg_color = Color(0.20760512, 0.41448236, 0.63722485, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gfpnr"]
+bg_color = Color(0.18031901, 0.37179008, 0.5773421, 0.72156864)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8b8aq"]
+bg_color = Color(0.75686276, 0.3254902, 0.32156864, 0.627451)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dkh6m"]
+bg_color = Color(0.52156866, 0.043137256, 0.05490196, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_s8m43"]
+bg_color = Color(0.8862745, 0.12156863, 0.13333334, 0.58431375)
+
+[node name="ListItemRoot" type="ListItem" unique_id=516074213]
+offset_right = 360.0
+offset_bottom = 40.0
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=1521710305]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PanelContainer" type="PanelContainer" parent="HBox" unique_id=504522591]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_0mjmx")
+
+[node name="NameEdit" type="LineEdit" parent="HBox/PanelContainer" unique_id=670303560]
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxEmpty_kcfdb")
+text = "Test"
+
+[node name="ShowButton" type="Button" parent="HBox" unique_id=484532062]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_2f2x2")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_o55sl")
+theme_override_styles/hover = SubResource("StyleBoxFlat_gfpnr")
+text = "💡"
+
+[node name="DeleteButton" type="Button" parent="HBox" unique_id=1410948444]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_8b8aq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_dkh6m")
+theme_override_styles/hover = SubResource("StyleBoxFlat_s8m43")
+text = "🗑️"
+
+[connection signal="text_submitted" from="HBox/PanelContainer/NameEdit" to="." method="_on_name_edit_text_submitted"]
+[connection signal="pressed" from="HBox/DeleteButton" to="." method="_on_delete_button_pressed"]

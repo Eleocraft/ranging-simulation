@@ -1,0 +1,275 @@
+[gd_scene format=3 uid="uid://ceiglbibeqy48"]
+
+[ext_resource type="Texture2D" uid="uid://cx2w08f4as1if" path="res://assets/art/grass.png" id="1_ae6xt"]
+[ext_resource type="PackedScene" uid="uid://ce10abin1gqoe" path="res://assets/scenes/side_menu.tscn" id="2_kuqao"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ae6xt"]
+
+[sub_resource type="HeightMapShape3D" id="HeightMapShape3D_0yn20"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0yn20"]
+albedo_texture = ExtResource("1_ae6xt")
+metallic = 0.77
+metallic_specular = 0.75
+roughness = 0.8
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ae6xt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ae6xt"]
+bg_color = Color(0.6905537, 0.012269888, 0.0024653533, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kuqao"]
+bg_color = Color(0.7570647, 0.0205507, 0.020177566, 1)
+
+[node name="Simulation" type="Node3D" unique_id=824461607]
+
+[node name="PhysicalFlyCam" type="PhysicalFlyCam" parent="." unique_id=1201314737]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 0)
+
+[node name="Camera3D" type="Camera3D" parent="PhysicalFlyCam" unique_id=1648778296]
+transform = Transform3D(1, 0, 0, 0, 0.66262007, 0.7489557, 0, -0.7489557, 0.66262007, 0, 0, 0)
+current = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PhysicalFlyCam" unique_id=638930145]
+shape = SubResource("SphereShape3D_ae6xt")
+
+[node name="Terrain" type="TerrainSimulation" parent="." unique_id=493730644]
+
+[node name="TerrainShape" type="CollisionShape3D" parent="Terrain" unique_id=217797587]
+shape = SubResource("HeightMapShape3D_0yn20")
+debug_color = Color(0.81390136, 5.4869056e-06, 0.512165, 0.41960785)
+
+[node name="TerrainVisual" type="MeshInstance3D" parent="Terrain" unique_id=74995789]
+material_override = SubResource("StandardMaterial3D_0yn20")
+mesh = SubResource("ArrayMesh_ae6xt")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=2115245627]
+transform = Transform3D(1, 0, 0, 0, 0.7609498, 0.6488108, 0, -0.6488108, 0.7609498, 0, 66.253944, 121.45576)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=547078848]
+
+[node name="TopMenuBar" type="SimMenu" parent="CanvasLayer" unique_id=1164977671]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 31.0
+grow_horizontal = 2
+
+[node name="LayoutBox" type="HBoxContainer" parent="CanvasLayer/TopMenuBar" unique_id=508528059]
+layout_mode = 2
+
+[node name="MenuBar" type="MenuBar" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=2059554923]
+layout_mode = 2
+
+[node name="Project" type="PopupMenu" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar" unique_id=714310471]
+item_count = 3
+item_0/text = "Save project under"
+item_0/id = 0
+item_0/disabled = true
+item_1/text = "Save project"
+item_1/id = 1
+item_1/disabled = true
+item_2/text = "Load project from"
+item_2/id = 2
+
+[node name="ProjectFileDialog" type="FileDialog" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Project" unique_id=1598949652]
+access = 2
+
+[node name="ResetConfirmationDialog" type="ConfirmationDialog" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Project" unique_id=2080684570]
+oversampling_override = 1.0
+title = "Reset Warning"
+size = Vector2i(919, 100)
+unresizable = true
+dialog_text = "Are you sure you want to proceed? All placed sensors will be permanently lost and the entire simulation will be reset!"
+
+[node name="TerrainMenu" type="PopupMenu" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar" unique_id=2033275780]
+oversampling_override = 1.0
+title = "TerrainMenu"
+size = Vector2i(478, 116)
+item_count = 4
+item_0/text = "Load via OpenTopography"
+item_0/id = 0
+item_1/text = "Load Raw GeoTIFF / DEM (.tif)"
+item_1/id = 1
+item_2/text = "Load 3D Mesh (.glb)"
+item_2/id = 2
+item_3/text = "Import Heightmap Image / Color-TIFF (.png, .jpg, .exr, .tif)"
+item_3/id = 3
+
+[node name="OpenTopoDialog" type="ConfirmationDialog" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu" unique_id=369218227]
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog" unique_id=1639083247]
+offset_right = 187.0
+offset_bottom = 171.0
+columns = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=440593915]
+layout_mode = 2
+text = "API Key:"
+
+[node name="ApiKeyInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=523319949]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=1181638900]
+layout_mode = 2
+text = "Latitude:"
+
+[node name="LatInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=1240468627]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=1406951331]
+layout_mode = 2
+text = "Longitude"
+
+[node name="LonInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=1645827302]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=1389440866]
+layout_mode = 2
+text = "Field Size X (m)"
+
+[node name="SizeXInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=872419323]
+layout_mode = 2
+
+[node name="Label5" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=2034874352]
+layout_mode = 2
+text = "Field Size Y (m)"
+
+[node name="SizeYInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog/GridContainer" unique_id=1504732427]
+layout_mode = 2
+
+[node name="TerrainFileDialog" type="FileDialog" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu" unique_id=961765388]
+title = "Open a File"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.tif, *.tiff ; Supported Heightmaps (*.tif)", "*.glb ; 3D Scene Model (*.glb)")
+
+[node name="ImageHeightmapDialog" type="ConfirmationDialog" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu" unique_id=419025406]
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog" unique_id=1229057624]
+offset_right = 40.0
+offset_bottom = 40.0
+columns = 2
+
+[node name="Label1" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=192828130]
+layout_mode = 2
+text = "MinHeight:
+"
+
+[node name="MinHeightInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=1568384497]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=1038526201]
+layout_mode = 2
+text = "Max Height: "
+
+[node name="MaxHeightInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=414642239]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=1192803909]
+layout_mode = 2
+text = "Field Size X (m)"
+
+[node name="SizeXInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=1554515993]
+layout_mode = 2
+
+[node name="Label4" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=196530099]
+layout_mode = 2
+text = "Field Size Y (m)"
+
+[node name="SizeYInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog/GridContainer" unique_id=1331860176]
+layout_mode = 2
+
+[node name="ResetConfirmationDialog" type="ConfirmationDialog" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu" unique_id=1300531510]
+oversampling_override = 1.0
+title = "Reset Warning"
+size = Vector2i(919, 100)
+unresizable = true
+dialog_text = "Are you sure you want to proceed? All placed sensors will be permanently lost and the entire simulation will be reset!"
+
+[node name="TiffDialog" type="ConfirmationDialog" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu" unique_id=237401138]
+
+[node name="GridContainer" type="GridContainer" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TiffDialog" unique_id=2128223364]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TiffDialog/GridContainer" unique_id=1064892359]
+layout_mode = 2
+text = "Field Size X (m)"
+
+[node name="SizeXInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TiffDialog/GridContainer" unique_id=206063941]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TiffDialog/GridContainer" unique_id=1116039813]
+layout_mode = 2
+text = "Field Size Y (m)"
+
+[node name="SizeYInput" type="LineEdit" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TiffDialog/GridContainer" unique_id=1274190405]
+layout_mode = 2
+
+[node name="Workspace" type="PopupMenu" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar" unique_id=460375834]
+title = "Workspace"
+item_count = 2
+item_0/text = "Free Cam (Spectator) - F1"
+item_0/id = 0
+item_1/text = "Node Editor - F2"
+item_1/id = 1
+
+[node name="Spacer" type="Control" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=2039997236]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=960725759]
+layout_mode = 2
+text = "--Idle--"
+
+[node name="Spacer2" type="Control" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=1284460424]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=2048961086]
+custom_minimum_size = Vector2(31, 31)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_ae6xt")
+theme_override_styles/hover = SubResource("StyleBoxFlat_kuqao")
+text = "X"
+
+[node name="Crosshair" type="Crosshair" parent="CanvasLayer" unique_id=781927331]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="SideMenu" parent="CanvasLayer" unique_id=599185070 instance=ExtResource("2_kuqao")]
+visible = false
+
+[connection signal="id_pressed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Project" to="CanvasLayer/TopMenuBar" method="_on_project_id_pressed"]
+[connection signal="file_selected" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Project/ProjectFileDialog" to="CanvasLayer/TopMenuBar" method="_on_project_file_dialog_file_selected"]
+[connection signal="canceled" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Project/ResetConfirmationDialog" to="Terrain" method="_on_reset_confirmation_dialog_canceled"]
+[connection signal="close_requested" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Project/ResetConfirmationDialog" to="Terrain" method="_on_reset_confirmation_dialog_canceled"]
+[connection signal="confirmed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Project/ResetConfirmationDialog" to="CanvasLayer/TopMenuBar" method="_on_reset_confirmation_dialog_confirmed"]
+[connection signal="id_pressed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu" to="Terrain" method="_on_terrain_menu_selected"]
+[connection signal="confirmed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/OpenTopoDialog" to="Terrain" method="_on_topo_dialog_confirmed"]
+[connection signal="file_selected" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TerrainFileDialog" to="Terrain" method="_on_terrain_file_dialog_file_selected"]
+[connection signal="confirmed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ImageHeightmapDialog" to="Terrain" method="_on_heightmap_dialog_confirmed"]
+[connection signal="canceled" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ResetConfirmationDialog" to="Terrain" method="_on_reset_confirmation_dialog_canceled"]
+[connection signal="close_requested" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ResetConfirmationDialog" to="Terrain" method="_on_reset_confirmation_dialog_canceled"]
+[connection signal="confirmed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ResetConfirmationDialog" to="Terrain" method="_on_reset_confirmation_dialog_confirmed"]
+[connection signal="confirmed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TiffDialog" to="Terrain" method="_on_tiff_dialog_confirmed"]
+[connection signal="id_pressed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Workspace" to="CanvasLayer/TopMenuBar" method="_on_workspace_id_pressed"]
+[connection signal="pressed" from="CanvasLayer/TopMenuBar/LayoutBox/CloseButton" to="CanvasLayer/TopMenuBar" method="_on_close_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/SideMenu/HBox/ToggleButton" to="CanvasLayer/SideMenu" method="_on_toggle_button_pressed"]
+
+[editable path="CanvasLayer/SideMenu"]

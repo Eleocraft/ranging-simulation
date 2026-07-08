@@ -1,0 +1,12 @@
+[workspace]
+members = [
+  "uwb",
+  "driver",
+  "sim",
+  "protocol",
+]
+resolver = "2"
+
+[workspace.dependencies]
+embedded-hal-sync = {version = "1.0"}
+embassy-time = {version = "0.3"}

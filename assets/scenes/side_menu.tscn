@@ -1,0 +1,348 @@
+[gd_scene format=3 uid="uid://ce10abin1gqoe"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_mwe0f"]
+bg_color = Color(0.48384058, 0.64770484, 0.5231588, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8hdq4"]
+bg_color = Color(0.4899928, 0.612642, 0.75203717, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4rmws"]
+bg_color = Color(0.4899928, 0.612642, 0.75203717, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2gqlu"]
+bg_color = Color(0.1764706, 0.1764706, 0.1764706, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_heoo0"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_eubdb"]
+bg_color = Color(0.41215244, 0.4121525, 0.41215235, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1r0x7"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_wickm"]
+bg_color = Color(0.41215244, 0.4121525, 0.41215235, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0dpsk"]
+bg_color = Color(0.27752784, 0.27752766, 0.27752778, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ca6qq"]
+bg_color = Color(0.05197101, 0.051970944, 0.05197095, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_r3404"]
+bg_color = Color(0.18717614, 0.18717614, 0.18717614, 1)
+
+[sub_resource type="Animation" id="Animation_0dpsk"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBox:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-360, 136)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("HBox/MenuPanel/VBox/Panel:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("HBox/MenuPanel/VBox/TitleBar/SpectatorTab:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("HBox/MenuPanel/VBox/TitleBar/NodeTab:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 35)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("HBox/MenuPanel/VBox/TitleBar/GarageTab:position")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 35)]
+}
+
+[sub_resource type="Animation" id="Animation_mwe0f"]
+resource_name = "switch_mode"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBox/MenuPanel/VBox/Panel:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.5, 2),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(180, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_vygtt"]
+resource_name = "switch_spectator"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBox/MenuPanel/VBox/TitleBar/SpectatorTab:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 2),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-360, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_p6w3x"]
+resource_name = "to_garage"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBox/MenuPanel/VBox/TitleBar/GarageTab:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.5, 2),
+"update": 0,
+"values": [Vector2(0, 35), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_lolfm"]
+resource_name = "to_node"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBox/MenuPanel/VBox/TitleBar/NodeTab:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.5, 2),
+"update": 0,
+"values": [Vector2(0, 35), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_howep"]
+resource_name = "to_spectator"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBox/MenuPanel/VBox/TitleBar/SpectatorTab:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(0.5, 2),
+"update": 0,
+"values": [Vector2(0, 35), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_ca6qq"]
+resource_name = "toggle menu"
+
+[sub_resource type="Animation" id="Animation_r3404"]
+resource_name = "toggle_menu"
+length = 0.3
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("HBox:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(0.5, 1),
+"update": 0,
+"values": [Vector2(-360, 136), Vector2(0, 136)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_heoo0"]
+_data = {
+&"RESET": SubResource("Animation_0dpsk"),
+&"switch_mode": SubResource("Animation_mwe0f"),
+&"switch_spectator": SubResource("Animation_vygtt"),
+&"to_garage": SubResource("Animation_p6w3x"),
+&"to_node": SubResource("Animation_lolfm"),
+&"to_spectator": SubResource("Animation_howep"),
+&"toggle menu": SubResource("Animation_ca6qq"),
+&"toggle_menu": SubResource("Animation_r3404")
+}
+
+[node name="SideMenu" type="SideMenu" unique_id=846414213]
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_right = 285.0
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="HBox" type="HBoxContainer" parent="." unique_id=817790693]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -404.0
+offset_right = 40.0
+offset_bottom = 396.0
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="MenuPanel" type="PanelContainer" parent="HBox" unique_id=1724931921]
+clip_contents = true
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="HBox/MenuPanel" unique_id=540496569]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="TitleBar" type="Control" parent="HBox/MenuPanel/VBox" unique_id=568580038]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="SpectatorTab" type="PanelContainer" parent="HBox/MenuPanel/VBox/TitleBar" unique_id=447255070]
+layout_mode = 0
+offset_right = 360.0
+offset_bottom = 30.00003
+theme_override_styles/panel = SubResource("StyleBoxFlat_mwe0f")
+
+[node name="Label" type="Label" parent="HBox/MenuPanel/VBox/TitleBar/SpectatorTab" unique_id=1671221373]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Spectator"
+
+[node name="NodeTab" type="PanelContainer" parent="HBox/MenuPanel/VBox/TitleBar" unique_id=1820797444]
+layout_mode = 0
+offset_top = 35.0
+offset_right = 360.0
+offset_bottom = 65.0
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_8hdq4")
+
+[node name="Label" type="Label" parent="HBox/MenuPanel/VBox/TitleBar/NodeTab" unique_id=1685193232]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Node Editor"
+
+[node name="GarageTab" type="PanelContainer" parent="HBox/MenuPanel/VBox/TitleBar" unique_id=925865306]
+layout_mode = 0
+offset_top = 35.0
+offset_right = 360.0
+offset_bottom = 65.0
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_4rmws")
+
+[node name="Label" type="Label" parent="HBox/MenuPanel/VBox/TitleBar/GarageTab" unique_id=2000156839]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Garage Editor"
+
+[node name="Panel" type="Panel" parent="HBox/MenuPanel/VBox" unique_id=1872865864]
+custom_minimum_size = Vector2(0, 35)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_2gqlu")
+
+[node name="TitleBarGarage" type="HBoxContainer" parent="HBox/MenuPanel/VBox" unique_id=1381070252]
+layout_mode = 2
+
+[node name="TitleGarage" type="Label" parent="HBox/MenuPanel/VBox/TitleBarGarage" unique_id=943908106]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Garage"
+
+[node name="AddGarage" type="Button" parent="HBox/MenuPanel/VBox/TitleBarGarage" unique_id=1099726368]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_heoo0")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_eubdb")
+text = "+"
+
+[node name="GarageList" type="VBoxContainer" parent="HBox/MenuPanel/VBox" unique_id=78164821]
+layout_mode = 2
+
+[node name="HSeparator2" type="HSeparator" parent="HBox/MenuPanel/VBox" unique_id=2066091739]
+layout_mode = 2
+
+[node name="TitleBarUWB" type="HBoxContainer" parent="HBox/MenuPanel/VBox" unique_id=99193036]
+layout_mode = 2
+
+[node name="TitleUWB" type="Label" parent="HBox/MenuPanel/VBox/TitleBarUWB" unique_id=102008236]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "UWB-Nodes"
+
+[node name="AddUWB" type="Button" parent="HBox/MenuPanel/VBox/TitleBarUWB" unique_id=1390374749]
+custom_minimum_size = Vector2(30, 30)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 20
+theme_override_styles/normal = SubResource("StyleBoxFlat_1r0x7")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_wickm")
+text = "+"
+
+[node name="UWBScroll" type="ScrollContainer" parent="HBox/MenuPanel/VBox" unique_id=1312231967]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="UWBList" type="VBoxContainer" parent="HBox/MenuPanel/VBox/UWBScroll" unique_id=980358586]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="ToggleButton" type="Button" parent="HBox" unique_id=1970359446]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+focus_mode = 0
+theme_override_styles/normal = SubResource("StyleBoxFlat_0dpsk")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ca6qq")
+theme_override_styles/hover = SubResource("StyleBoxFlat_r3404")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=497255650]
+libraries/ = SubResource("AnimationLibrary_heoo0")
+
+[connection signal="pressed" from="HBox/MenuPanel/VBox/TitleBarGarage/AddGarage" to="." method="_on_add_garage_pressed"]
+[connection signal="pressed" from="HBox/MenuPanel/VBox/TitleBarUWB/AddUWB" to="." method="_on_add_uwb_pressed"]

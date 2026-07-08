@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://tm5x5revk2us"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_rhsb2"]
+size = Vector3(0.06, 0.4, 0.06)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vjq4k"]
+albedo_color = Color(1, 0.15686275, 0.12156863, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dms5a"]
+size = Vector3(0.03, 0.002, 0.03)
+
+[node name="SensorBlueprint" type="Node3D" unique_id=1290237280]
+
+[node name="Placeholder" type="MeshInstance3D" parent="." unique_id=1947103733]
+mesh = SubResource("BoxMesh_rhsb2")
+
+[node name="UWB" type="MeshInstance3D" parent="." unique_id=855565292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20079413, 0)
+material_override = SubResource("StandardMaterial3D_vjq4k")
+mesh = SubResource("BoxMesh_dms5a")

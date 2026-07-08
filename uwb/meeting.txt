@@ -1,0 +1,13 @@
+- completed abstraction layer for uwb-com
+- goal: use the exact same high-level protocol code for both sim and embedded hardware
+- two different implementations work against that interface -> simpler, more organized and less error-prone protocol-code
+- developed several modular blocks
+  - custom time abstraction
+  - error-model
+  - hardware-config
+  - MAC Frame with payload and parsing
+
+- next step:
+  - finish the two implementations for sim and actual embedded hardware
+  - begin writing the protocols for TWR and Node Discovery
+  - test it
