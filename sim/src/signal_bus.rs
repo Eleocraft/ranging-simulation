@@ -8,6 +8,7 @@ pub enum SimState {
     Spectator,
     GarageEditor,
     NodeEditor,
+    Simulation,
 }
 
 impl SimState {
@@ -17,6 +18,7 @@ impl SimState {
             SimState::Spectator => "Spectator",
             SimState::NodeEditor => "Editor",
             SimState::GarageEditor => "Editor",
+            SimState::Simulation => "Simulation",
         };
         String::from(text)
     }
@@ -27,6 +29,7 @@ impl SimState {
             SimState::Spectator => Color::from_rgb(0.2, 0.8, 0.2),
             SimState::NodeEditor => Color::from_rgb(0.9, 0.5, 0.1),
             SimState::GarageEditor => Color::from_rgb(0.9, 0.5, 0.1),
+            SimState::Simulation => Color::from_rgb(0.2, 0.4, 0.9),
         }
     }
 }
@@ -51,4 +54,8 @@ impl SignalBus {
     pub fn on_garage_ex_changed(exists: bool);
     #[signal]
     pub fn new_object_spawned(sensor: bool, name: String, id: u32);
+    #[signal]
+    pub fn sim_speed_changed(new_speed: u32);
+    #[signal]
+    pub fn sim_playback_state_changed(new_state: u32);
 }

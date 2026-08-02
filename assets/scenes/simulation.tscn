@@ -15,6 +15,24 @@ roughness = 0.8
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_ae6xt"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e4bcq"]
+bg_color = Color(0.25490198, 0.69803923, 0.46666667, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_il7r0"]
+bg_color = Color(0.17704424, 0.50258505, 0.3320782, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_sde74"]
+bg_color = Color(0.3383316, 0.8867984, 0.59924316, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p3qpy"]
+bg_color = Color(0.89211017, 0.4095286, 0.6291497, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8k6nv"]
+bg_color = Color(0.67221445, 0.2103568, 0.4389437, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_whe11"]
+bg_color = Color(0.9562444, 0.6915547, 0.7955159, 1)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ae6xt"]
 bg_color = Color(0.6905537, 0.012269888, 0.0024653533, 1)
 
@@ -51,7 +69,7 @@ transform = Transform3D(1, 0, 0, 0, 0.7609498, 0.6488108, 0, -0.6488108, 0.76094
 [node name="TopMenuBar" type="SimMenu" parent="CanvasLayer" unique_id=1164977671]
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 31.0
+offset_bottom = 40.0
 grow_horizontal = 2
 
 [node name="LayoutBox" type="HBoxContainer" parent="CanvasLayer/TopMenuBar" unique_id=508528059]
@@ -209,11 +227,13 @@ layout_mode = 2
 
 [node name="Workspace" type="PopupMenu" parent="CanvasLayer/TopMenuBar/LayoutBox/MenuBar" unique_id=460375834]
 title = "Workspace"
-item_count = 2
-item_0/text = "Free Cam (Spectator) - F1"
+item_count = 3
+item_0/text = "Free Cam (Spectator) "
 item_0/id = 0
-item_1/text = "Node Editor - F2"
+item_1/text = "Node Editor "
 item_1/id = 1
+item_2/text = "Simulation"
+item_2/id = 2
 
 [node name="Spacer" type="Control" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=2039997236]
 layout_mode = 2
@@ -223,14 +243,71 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "--Idle--"
 
-[node name="Spacer2" type="Control" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=1284460424]
+[node name="Control" type="Control" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=168174737]
+clip_contents = true
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+
+[node name="Spacer2" type="HBoxContainer" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=1159186943]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CloseButton" type="Button" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=2048961086]
-custom_minimum_size = Vector2(31, 31)
+[node name="SimPanel" type="SimPanel" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2" unique_id=236847307]
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_horizontal = 6
+
+[node name="SimSpeed" type="HBoxContainer" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel" unique_id=1885515918]
+layout_mode = 2
+
+[node name="Label2" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed" unique_id=727531565]
+layout_mode = 2
+text = "Sim Speed"
+
+[node name="Slider" type="HSlider" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed" unique_id=2034054207]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+max_value = 15.0
+
+[node name="Label" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed" unique_id=1042461956]
+custom_minimum_size = Vector2(180, 40)
+layout_mode = 2
+size_flags_vertical = 1
+text = "50 μs / Frame"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Play" type="Button" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed" unique_id=1199739175]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_e4bcq")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_il7r0")
+theme_override_styles/hover = SubResource("StyleBoxFlat_sde74")
+text = "▶"
+
+[node name="Control" type="Control" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed" unique_id=1772698065]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Stop" type="Button" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed" unique_id=2015477850]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_styles/normal = SubResource("StyleBoxFlat_p3qpy")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_8k6nv")
+theme_override_styles/hover = SubResource("StyleBoxFlat_whe11")
+disabled = true
+text = "■"
+
+[node name="Time" type="Label" parent="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed" unique_id=317063350]
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+size_flags_vertical = 1
+text = "00:00:000:000:000"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CloseButton" type="Button" parent="CanvasLayer/TopMenuBar/LayoutBox" unique_id=2048961086]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
 theme_override_styles/normal = SubResource("StyleBoxFlat_ae6xt")
 theme_override_styles/hover = SubResource("StyleBoxFlat_kuqao")
 text = "X"
@@ -269,6 +346,10 @@ visible = false
 [connection signal="confirmed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/ResetConfirmationDialog" to="Terrain" method="_on_reset_confirmation_dialog_confirmed"]
 [connection signal="confirmed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/TerrainMenu/TiffDialog" to="Terrain" method="_on_tiff_dialog_confirmed"]
 [connection signal="id_pressed" from="CanvasLayer/TopMenuBar/LayoutBox/MenuBar/Workspace" to="CanvasLayer/TopMenuBar" method="_on_workspace_id_pressed"]
+[connection signal="drag_ended" from="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed/Slider" to="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel" method="_on_slider_drag_ended"]
+[connection signal="value_changed" from="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed/Slider" to="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel" method="_on_slider_value_changed"]
+[connection signal="pressed" from="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed/Play" to="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel" method="_on_play_pressed"]
+[connection signal="pressed" from="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel/SimSpeed/Stop" to="CanvasLayer/TopMenuBar/LayoutBox/Spacer2/SimPanel" method="_on_stop_pressed"]
 [connection signal="pressed" from="CanvasLayer/TopMenuBar/LayoutBox/CloseButton" to="CanvasLayer/TopMenuBar" method="_on_close_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/SideMenu/HBox/ToggleButton" to="CanvasLayer/SideMenu" method="_on_toggle_button_pressed"]
 

@@ -60,12 +60,18 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.485, 0.731, -0.685)
 material_override = SubResource("StandardMaterial3D_iv3fp")
 mesh = SubResource("BoxMesh_q0v85")
 
+[node name="UwbNode" type="UwbNode" parent="UWB_Center" unique_id=1045543959]
+
 [node name="UWB_Z" type="MeshInstance3D" parent="." unique_id=891338835]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.485, 0.731, 0.815)
 material_override = SubResource("StandardMaterial3D_17rb1")
 mesh = SubResource("BoxMesh_ev1oy")
 
+[node name="UwbNode" type="UwbNode" parent="UWB_Z" unique_id=1292942651]
+
 [node name="UWB_X" type="MeshInstance3D" parent="." unique_id=1499503583]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.015, 0.731, -0.685)
 material_override = SubResource("StandardMaterial3D_17rb1")
 mesh = SubResource("BoxMesh_ev1oy")
+
+[node name="UwbNode" type="UwbNode" parent="UWB_X" unique_id=1850352776]

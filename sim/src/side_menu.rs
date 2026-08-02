@@ -202,6 +202,8 @@ impl SideMenu {
                         .get_node_as::<PanelContainer>("HBox/MenuPanel/VBox/TitleBar/SpectatorTab")
                         .set_position(Vector2::new(0.0, 0.0));
                 }
+
+                _ => {}
             }
         }
     }

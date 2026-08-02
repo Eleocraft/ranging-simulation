@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://ds1i56jbwxded"]
+
+[node name="switch" type="Control" unique_id=1346728793]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 212.0
+offset_bottom = 31.0
+
+[node name="HSlider" type="HSlider" parent="." unique_id=1170395848]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 16.0

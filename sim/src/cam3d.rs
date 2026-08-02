@@ -7,7 +7,8 @@ use godot::global::MouseButton;
 use godot::prelude::*;
 
 use crate::signal_bus::{SignalBus, SimState};
-use crate::sim_core::{SimCore, SimEvent, SimObjectData};
+use crate::sim_core::{SimCore, SimEvent};
+use crate::sim_types::SimObjectData;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum SpawnType {
@@ -212,7 +213,7 @@ impl ICharacterBody3D for PhysicalFlyCam {
             limit_z_max: 100.0,
             limit_x_min: 0.0,
             limit_z_min: 0.0,
-            next_id: 1,
+            next_id: 10,
             base,
             blueprint_sensor: None,
             blueprint_garage: None,

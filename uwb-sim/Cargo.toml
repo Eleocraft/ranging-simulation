@@ -1,16 +1,13 @@
 [package]
-name = "sim"
+name = "uwb-sim"
 version = "0.1.0"
 edition = "2024"
 authors = [ "Eliseo Cailloux", "Lukas Lein", "Sophie Menninger" ]
 
-[lib]
-crate-type = ["cdylib"]
 
 [dependencies]
 uwb = { path = "../uwb" }
 driver = { path = "../driver" }
-uwb-sim = { path = "../uwb-sim" }
 
 godot = "0.5.3"
 regex = "1.12.4"

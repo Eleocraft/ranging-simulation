@@ -15,7 +15,8 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use tiff::decoder::{Decoder, DecodingResult};
 
 use crate::signal_bus::{SignalBus, SimState};
-use crate::sim_core::{SimCore, SimEvent, TerrainData};
+use crate::sim_core::{SimCore, SimEvent};
+use crate::sim_types::TerrainData;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TerrainType {

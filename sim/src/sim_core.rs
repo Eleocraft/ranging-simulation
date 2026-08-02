@@ -4,66 +4,17 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
+use uwb_sim::sim_error::SimHalError;
 
 use crate::{
+    node::UwbNode,
+    propagation::{LinkInfo, LinkQuality, PathInfo, calc_direct_path, debug_print_connectivity},
     signal_bus::{SignalBus, SimState},
+    sim_engine::{NodeId, SimulationEngine},
+    sim_logic::{PlaybackState, SimCom, SimComEvent},
+    sim_types::*,
     simulation::TerrainType,
 };
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct GarageSaveData {
-    name: String,
-    position: [f32; 3],
-}
-
-#[derive(Serialize, Deserialize)]
-struct ProjectData {
-    terrain: TerrainData,
-    sensors: HashMap<String, [f32; 3]>,
-    garage: Option<GarageSaveData>,
-}
-
-#[derive(Debug, Clone)]
-pub struct SimObjectData {
-    pub id: u32,
-    pub name: String,
-    pub position: Vector3,
-    pub instance: Gd<Node3D>,
-}
-
-impl SimObjectData {
-    pub fn new(id: u32, name: String, pos: Vector3, instance: Gd<Node3D>) -> Self {
-        Self {
-            position: pos,
-            instance,
-            id,
-            name,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct TerrainData {
-    pub terrain_path: String,
-    pub terrain_type: TerrainType,
-    pub size_x: f64,
-    pub size_y: f64,
-    pub max_height: Option<f32>,
-    pub min_height: Option<f32>,
-}
-
-impl Default for TerrainData {
-    fn default() -> Self {
-        Self {
-            terrain_path: String::new(),
-            terrain_type: TerrainType::None,
-            size_x: 200.0,
-            size_y: 200.0,
-            max_height: None,
-            min_height: None,
-        }
-    }
-}
 
 #[derive(Debug)]
 pub enum SimEvent {
@@ -75,25 +26,42 @@ pub enum SimEvent {
     AddGarage(SimObjectData),
     RemoveListItem(u32),
     ItemNameChanged(u32, String),
+    SetSimSpeed(u32),
+    SetPlaybackState(PlaybackState),
 }
 
 #[derive(GodotClass)]
 #[class(base=Node)]
 pub struct SimCore {
     base: Base<Node>,
+
+    /// Cached access to signal bus
     signal_bus: Option<Gd<SignalBus>>,
 
+    /// not time based events
     event_queue: Vec<SimEvent>,
+
+    /// time bases events and scheduler
+    engine: SimulationEngine,
 
     // global states
     sim_state: SimState,
 
+    /// Obejct data
     sensor_data: Vec<SimObjectData>,
     garage_data: Option<SimObjectData>,
 
+    /// Node data
+    uwb_nodes: Vec<SimUwbNode>,
+
+    /// Terrain configuration
     terrain_data: Option<TerrainData>,
+
     project_path: Option<String>,
     can_save: bool,
+
+    /// Connectivity data calculated through godot physics world
+    connectivity_dirty: bool,
 }
 
 #[godot_api]
@@ -104,11 +72,14 @@ impl INode for SimCore {
             sensor_data: Vec::new(),
             garage_data: None,
             terrain_data: None,
+            uwb_nodes: Vec::new(),
             project_path: None,
             can_save: false,
             event_queue: Vec::new(),
             signal_bus: None,
+            connectivity_dirty: true,
             base,
+            engine: SimulationEngine::new(),
         }
     }
 
@@ -125,11 +96,44 @@ impl INode for SimCore {
     }
 
     fn physics_process(&mut self, _delta: f64) {
+        // 1) Commands from UI and scene objects
         self.process_events();
+
+        // 2) step in sim
+        self.engine.tick();
+
+        // 3) Rebuild connectivity if necessary and send to engine
+        if self.connectivity_dirty {
+            let graph = self.rebuild_connectivity_graph();
+            self.engine.update_links(graph);
+            self.connectivity_dirty = false;
+        }
     }
 }
 
 impl SimCore {
+    pub fn get_playback_state(&self) -> PlaybackState {
+        self.engine.get_playback_state()
+    }
+
+    pub fn get_sim_speed(&self) -> u32 {
+        self.engine.get_sim_speed()
+    }
+
+    pub fn get_engine_mut(&mut self) -> &mut SimulationEngine {
+        &mut self.engine
+    }
+
+    pub fn get_engine(&self) -> &SimulationEngine {
+        &self.engine
+    }
+
+    pub fn get_link_info(&self, from_id: u32, to_id: u32) -> Option<&LinkInfo> {
+        self.connectivity_graph
+            .get(&from_id)
+            .and_then(|target| target.get(&to_id))
+    }
+
     pub fn get_terrain_data(&self) -> Option<TerrainData> {
         self.terrain_data.clone()
     }
@@ -168,9 +172,13 @@ impl SimCore {
                     self.clear_sim_objects();
                     self.terrain_data = None;
                     self.sensor_data.clear();
+                    self.uwb_nodes.clear();
                     self.garage_data = None;
                     self.can_save = false;
                     self.project_path = None;
+                    self.engine.reset();
+                    self.connectivity_dirty = true;
+                    self.connectivity_graph.clear();
                     // Access Signal Bus and emit signal
                     if let Some(bus) = &self.signal_bus {
                         bus.signals().sim_state_changed().emit(SimState::Idle);
@@ -178,6 +186,10 @@ impl SimCore {
                         bus.signals().project_item_state_changed().emit(1, true);
                         bus.signals().on_garage_ex_changed().emit(false);
                     }
+                }
+                SimEvent::SetPlaybackState(state) => {
+                    godot_print!("[SimCore] state: {}", state as u32);
+                    self.engine.set_playback_state(state);
                 }
                 SimEvent::AddSensor(sensor_data) => {
                     godot_print!(
@@ -195,7 +207,19 @@ impl SimCore {
                         );
                     }
 
+                    let mut uwb_node = sensor_data.instance.get_node_as::<UwbNode>("UWB/UwbNode");
+
+                    uwb_node.bind_mut().set_id(sensor_data.id);
+
+                    self.uwb_nodes.push(SimUwbNode {
+                        id: sensor_data.id,
+                        position: uwb_node.get_global_position(),
+                        node_type: NodeType::Normal,
+                        instance: uwb_node,
+                    });
+
                     self.sensor_data.push(sensor_data);
+                    self.connectivity_dirty = true;
                 }
                 SimEvent::AddGarage(garage_data) => {
                     if self.garage_data.is_none() {
@@ -210,10 +234,44 @@ impl SimCore {
                                 garage_data.id,
                             );
                         }
+
+                        let mut uwb_node_center = garage_data
+                            .instance
+                            .get_node_as::<UwbNode>("UWB_Center/UwbNode");
+                        let mut uwb_node_x =
+                            garage_data.instance.get_node_as::<UwbNode>("UWB_X/UwbNode");
+                        let mut uwb_node_z =
+                            garage_data.instance.get_node_as::<UwbNode>("UWB_Z/UwbNode");
+
+                        uwb_node_center.bind_mut().set_id(garage_data.id);
+                        uwb_node_x.bind_mut().set_id(garage_data.id + 1);
+                        uwb_node_z.bind_mut().set_id(garage_data.id + 2);
+
+                        self.uwb_nodes.push(SimUwbNode {
+                            id: garage_data.id,
+                            position: uwb_node_center.get_global_position(),
+                            node_type: NodeType::Garage(GarageNode::Center),
+                            instance: uwb_node_center,
+                        });
+                        self.uwb_nodes.push(SimUwbNode {
+                            id: garage_data.id + 1,
+                            position: uwb_node_x.get_global_position(),
+                            node_type: NodeType::Garage(GarageNode::X),
+                            instance: uwb_node_x,
+                        });
+                        self.uwb_nodes.push(SimUwbNode {
+                            id: garage_data.id + 2,
+                            position: uwb_node_z.get_global_position(),
+                            node_type: NodeType::Garage(GarageNode::Z),
+                            instance: uwb_node_z,
+                        });
+
                         self.garage_data = Some(garage_data);
+                        self.connectivity_dirty = true;
                     }
                 }
                 SimEvent::RemoveListItem(id) => {
+                    self.connectivity_dirty = true;
                     if id == 0 {
                         // delete garage
                         if let Some(garage) = self.garage_data.take() {
@@ -221,6 +279,10 @@ impl SimCore {
                             if instance.is_instance_valid() {
                                 instance.queue_free();
                             }
+
+                            // delete 3 uwb nodes on the garage
+                            let looking_for_ids = vec![0, 1, 2];
+                            self.uwb_nodes.retain(|s| !looking_for_ids.contains(&s.id));
 
                             if let Some(bus) = &self.signal_bus {
                                 bus.signals().on_garage_ex_changed().emit(false);
@@ -235,6 +297,9 @@ impl SimCore {
                             let mut instance = removed_sensor.instance;
                             if instance.is_instance_valid() {
                                 instance.queue_free();
+                            }
+                            if let Some(index) = self.uwb_nodes.iter().position(|s| s.id == id) {
+                                let _ = self.uwb_nodes.remove(index);
                             }
                             godot_print!("[SimCore] Sensor (ID: {}) successfully deleted", id);
                         }
@@ -253,6 +318,13 @@ impl SimCore {
                             godot_print!("[SimCore] Sensor (ID: {}) renamed to {}", id, &new_name);
                         }
                     }
+                }
+                SimEvent::SetSimSpeed(speed) => {
+                    self.engine.set_sim_speed(speed);
+                    if let Some(bus) = &self.signal_bus {
+                        bus.signals().sim_speed_changed().emit(speed);
+                    }
+                    godot_print!("[SimCore] Speed set to {}", speed);
                 }
             }
         }
@@ -455,5 +527,70 @@ impl SimCore {
                 godot_error!("[SimCore] Serialization failed. Error: {:?}", err);
             }
         }
+    }
+
+    fn rebuild_connectivity_graph(&self) -> HashMap<NodeId, HashMap<NodeId, LinkInfo>> {
+        const MASK: u32 = 1;
+
+        let mut graph = HashMap::new();
+
+        let Some(viewport) = self.base().get_viewport() else {
+            godot_error!("[SimCore] No viewport available");
+            return graph;
+        };
+
+        let Some(world_3d) = viewport.get_world_3d() else {
+            godot_error!("[SimCore] No World3D available");
+            return graph;
+        };
+
+        let Some(space_state) = world_3d.get_direct_space_state() else {
+            godot_error!("[SimCore] No SpaceState available");
+            return graph;
+        };
+
+        for node in &self.uwb_nodes {
+            if node.instance.is_instance_valid() {
+                graph.insert(node.id, HashMap::new());
+            }
+        }
+
+        for i in 0..self.uwb_nodes.len() {
+            for j in (i + 1)..self.uwb_nodes.len() {
+                let a = &self.uwb_nodes[i];
+                let b = &self.uwb_nodes[j];
+
+                if !a.instance.is_instance_valid() || !b.instance.is_instance_valid() {
+                    continue;
+                }
+
+                let Some(path_info) =
+                    calc_direct_path(space_state.clone(), a.position, b.position, MASK)
+                else {
+                    continue;
+                };
+
+                let link_info = LinkInfo {
+                    path: path_info,
+                    quality: LinkQuality {},
+                };
+
+                if let Some(target) = graph.get_mut(&a.id) {
+                    target.insert(b.id, link_info.clone());
+                }
+
+                if let Some(target) = graph.get_mut(&b.id) {
+                    target.insert(a.id, link_info.clone());
+                }
+            }
+        }
+
+        godot_print!(
+            "[SimCore] Connectivity graph rebuilt for {} UWB nodes",
+            self.uwb_nodes.len()
+        );
+        debug_print_connectivity(&graph);
+
+        graph
     }
 }

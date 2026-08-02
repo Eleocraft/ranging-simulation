@@ -2,6 +2,7 @@
 
 use crate::config::{RxConfig, UwbConfig};
 use crate::error::UwbError;
+use crate::frame::MacFrame;
 use crate::time::{UWBDuration, UWBTimestamp};
 
 /// Information returned after successful transmission
@@ -49,7 +50,7 @@ pub trait UwbHal<const MAX_FRAME_SIZE: usize> {
     async fn now(&mut self) -> Result<UWBTimestamp, UwbError>;
 
     /// Transmit a frame immediately
-    async fn transmit(&mut self, data: &[u8]) -> Result<TxInfo, UwbError>;
+    async fn transmit(&mut self, message: &[u8]) -> Result<TxInfo, UwbError>;
 
     /// Transmit a frame at an exact future UWB timestamp
     async fn transmit_at(

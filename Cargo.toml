@@ -1,6 +1,7 @@
 [workspace]
 members = [
   "uwb",
+  "uwb-sim",
   "driver",
   "sim",
   "protocol",

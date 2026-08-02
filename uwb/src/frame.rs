@@ -147,6 +147,7 @@ impl MacFrameControl {
 // MacFrame
 // =======================================================================================================
 
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct MacFrame<const N: usize> {
     pub frame_control: MacFrameControl,
     pub sequence_number: u8,

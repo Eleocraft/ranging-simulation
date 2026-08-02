@@ -18,3 +18,5 @@ mesh = SubResource("BoxMesh_rhsb2")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.20079413, 0)
 material_override = SubResource("StandardMaterial3D_vjq4k")
 mesh = SubResource("BoxMesh_dms5a")
+
+[node name="UwbNode" type="UwbNode" parent="UWB" unique_id=1925938576]

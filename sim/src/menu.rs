@@ -72,6 +72,13 @@ impl IPanelContainer for SimMenu {
                 sim_core
                     .bind_mut()
                     .push_sim_event(SimEvent::SetSimState(SimState::NodeEditor));
+            } else if input.is_action_just_pressed("simulation")
+                && self.sim_state != SimState::Simulation
+            {
+                godot_print!("test");
+                sim_core
+                    .bind_mut()
+                    .push_sim_event(SimEvent::SetSimState(SimState::Simulation));
             }
         }
     }
@@ -93,7 +100,8 @@ impl SimMenu {
         }
 
         if let Some(mut crosshair) = self.base().try_get_node_as::<Control>("../Crosshair") {
-            let is_editor = self.sim_state == SimState::NodeEditor || self.sim_state == SimState::GarageEditor;
+            let is_editor =
+                self.sim_state == SimState::NodeEditor || self.sim_state == SimState::GarageEditor;
             crosshair.set_visible(is_editor);
         }
         if new_mode != SimState::Idle {
@@ -136,6 +144,9 @@ impl SimMenu {
                 1 => sim_core
                     .bind_mut()
                     .push_sim_event(SimEvent::SetSimState(SimState::NodeEditor)),
+                2 => sim_core
+                    .bind_mut()
+                    .push_sim_event(SimEvent::SetSimState(SimState::Simulation)),
                 _ => {}
             }
         } else {

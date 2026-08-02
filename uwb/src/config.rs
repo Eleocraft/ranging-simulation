@@ -12,6 +12,19 @@ pub struct UwbConfig {
     pub tx_power: TxPowerConfig,
 }
 
+impl Default for UwbConfig {
+    fn default() -> Self {
+        Self {
+            address: Default::default(),
+            phy: Default::default(),
+            mac: Default::default(),
+            interrupt: Default::default(),
+            antenna_delay: Default::default(),
+            tx_power: Default::default(),
+        }
+    }
+}
+
 impl UwbConfig {
     pub const MAX_STANDARD_FRAME_SIZE: usize = 127;
     pub const MAX_EXTENDED_FRAME_SIZE: usize = 1023;
@@ -86,15 +99,15 @@ impl Default for PhyConfig {
     }
 }
 
-/// Supported DW1000 UWB channels
+/// Supported DW1000 UWB channels (only 500MHz bandwidth)
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum UwbChannel {
     Ch1,
     Ch2,
     Ch3,
-    Ch4,
+    //Ch4,
     Ch5,
-    Ch7,
+    //Ch7,
 }
 
 /// Supported DW1000 data rates
@@ -278,17 +291,11 @@ pub struct TxPowerConfig {
     /// - DW1000 can use higher power for short 6.8Mbps frames while stying within average
     ///   relulatory limits
     pub smart_power: bool,
-
-    /// Optional raw DW1000 TX_POWER register value
-    pub raw_tx_power: Option<u32>,
 }
 
 impl Default for TxPowerConfig {
     fn default() -> Self {
-        Self {
-            smart_power: true,
-            raw_tx_power: None,
-        }
+        Self { smart_power: true }
     }
 }
 

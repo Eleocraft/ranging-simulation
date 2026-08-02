@@ -1,5 +1,6 @@
 use crate::error::*;
-use crate::frame::{MacAddress, MacFrameBuilder, MacFrameControl};
+use crate::frame::{MacAddress, MacFrameControl};
+use crate::frame_builder::MacFrameBuilder;
 use crate::time::UWBTimestamp;
 
 pub trait UwbSerialize: Sized {
