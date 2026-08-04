@@ -1,0 +1,16 @@
+[package]
+name = "node"
+version = "0.1.0"
+edition = "2024"
+authors = [ "Eliseo Cailloux", "Lukas Lein", "Sophie Menninger" ]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+uwb = { path = "../uwb" }
+
+godot = "0.5.3"
+
+libm = "0.2.16"
+nalgebra = { version = "0.35.0", default-features = false, features = ["libm"] }
