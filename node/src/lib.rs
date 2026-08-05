@@ -1,9 +1,9 @@
 mod dw_mds;
+mod ranging;
+
 use dw_mds::DwMDS;
 
 use uwb::hal::UwbHal;
-
-use nalgebra as na;
 
 const MAX_FRAME_SIZE: usize = 64;
 
@@ -15,8 +15,8 @@ where TRC: UwbHal<MAX_FRAME_SIZE> {
 
 impl<TRC> Node<TRC>
 where TRC: UwbHal<MAX_FRAME_SIZE> {
-    pub fn new(initial: na::Vector3<f32>, uwb_tranceiver: TRC) -> Self {
-        let mds_solver = DwMDS::new(initial, Default::default());
+    pub fn new(uwb_tranceiver: TRC) -> Self {
+        let mds_solver = DwMDS::unseeded(Default::default());
         Self {
             uwb_tranceiver,
             mds_solver,

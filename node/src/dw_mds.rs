@@ -71,11 +71,7 @@ impl Neighbour {
     /// blindfolded nodes appears in two local costs, `S_i` and `S_j`, so each
     /// end carries `w_ij` and the halves add back up. An anchor runs no local
     /// cost to carry its half, so `S_i` has to hold the full `2 w_ij`.
-    ///
-    /// Without the distinction `sum_i S_i` no longer reconstructs the global
-    /// stress, and anchors pull only half as hard as their range measurements
-    /// deserve relative to the peers around them.
-    fn weight(&self) -> f32 {
+    fn effective_weight(&self) -> f32 {
         if self.anchor { 2. * self.w_ij } else { self.w_ij }
     }
 }
@@ -99,7 +95,21 @@ impl DwMDS {
         Self {
             x_i: initial,
             x: BTreeMap::new(),
-            x_bar: initial,
+            x_bar: na::Vector3::zeros(),
+            r_i: 0.,
+            config,
+        }
+    }
+
+    /// Starts at zero without additional information.
+    /// **solving from unseeded nodes will cause the algorithm to deadlock.**
+    /// call `seed_from_neighbours()` after observing a sufficient number of neighbours
+    /// in order to keep that from happening.
+    pub fn unseeded(config: Config) -> Self {
+        Self {
+            x_i: na::Vector3::zeros(),
+            x: BTreeMap::new(),
+            x_bar: na::Vector3::zeros(),
             r_i: 0.,
             config,
         }
@@ -132,9 +142,8 @@ impl DwMDS {
     /// the measured range `range` to it, and the confidence `weight` in that
     /// range, derived from the RF quality indicators of the exchange.
     ///
-    /// Repeated exchanges with the same neighbour **accumulate** rather than
-    /// replace, which is how the paper handles the `K` measurements available
-    /// for a pair: the weights add and the ranges average by weight,
+    /// Repeated exchanges with the same neighbour **accumulate**:
+    /// the weights add and the ranges average by weight,
     ///
     /// ```text
     /// w_ij    <- w_ij + w_new
@@ -149,9 +158,12 @@ impl DwMDS {
     /// first, otherwise its accumulated history keeps voting for where it
     /// used to be.
     ///
-    /// `weight` is clamped to be non-negative; zero contributes nothing and
-    /// leaves the link as it was. Two properties matter for the distributed
-    /// algorithm to behave:
+    /// A `weight` of zero or less records no link: the paper reads `w_ij = 0`
+    /// as "`j` is not in the neighbourhood of `i`" (eq. 16), so no entry is
+    /// created and an existing one keeps everything it had accumulated. The
+    /// broadcast `pos` is still taken, since it does not come from the range.
+    ///
+    /// Two properties matter for the distributed algorithm to behave:
     ///
     /// - **Symmetry.** Node `j` must weight this link the same way, because
     ///   the global stress counts the pair once and both local costs have to
@@ -179,30 +191,34 @@ impl DwMDS {
     }
 
     fn insert(&mut self, id: u32, pos: na::Vector3<f32>, range: f32, weight: f32, anchor: bool) {
-        let w_new = weight.max(0.);
+        // A weightless exchange carries no range evidence, so nothing
+        // accumulates. The position the neighbour broadcast is independent of
+        // the range and still current, so it is worth keeping. An unknown
+        // neighbour stays unknown: zero weight means "not in the
+        // neighbourhood" (paper eq. 16).
+        if weight <= 0. {
+            self.set_neighbour_position(id, pos);
+            return;
+        }
 
         // if the node alredy exists in x, sum up weight and update range
         if let Some(n) = self.x.get_mut(&id)
             && n.anchor == anchor
         {
-            let w_ij = n.w_ij + w_new;
-            // With no weight on either side there is nothing to average, so
-            // the range is taken as observed.
-            n.delta_ij = if w_ij > 0. {
-                (n.w_ij * n.delta_ij + w_new * range) / w_ij
-            } else {
-                range
-            };
+            let w_ij = n.w_ij + weight;
+            n.delta_ij = (n.w_ij * n.delta_ij + weight * range) / w_ij;
             n.w_ij = w_ij;
             n.x_j = pos;
             return;
         }
 
+        // A neighbour that changed kind is a different node as far as the cost
+        // is concerned, so its accumulator restarts.
         self.x.insert(
             id,
             Neighbour {
                 x_j: pos,
-                w_ij: w_new,
+                w_ij: weight,
                 delta_ij: range,
                 anchor,
             },
@@ -225,9 +241,10 @@ impl DwMDS {
         self.x.remove(&id);
     }
 
-    /// Number of neighbours contributing to the local cost.
+    /// Number of neighbours contributing to the local cost. Every stored link
+    /// has `w_ij > 0`, as [`DwMDS::observe`] never records a weightless one.
     pub fn neighbour_count(&self) -> usize {
-        self.x.values().filter(|n| n.w_ij > 0.).count()
+        self.x.len()
     }
 
     /// Seeds the estimate with the weighted average of the neighbouring positions.
@@ -237,8 +254,8 @@ impl DwMDS {
         let mut total = 0.;
 
         for n in self.x.values() {
-            sum += n.weight() * n.x_j;
-            total += n.weight();
+            sum += n.effective_weight() * n.x_j;
+            total += n.effective_weight();
         }
 
         if total > f32::EPSILON {
@@ -249,20 +266,20 @@ impl DwMDS {
     /// Local cost `S_i` (paper eq. 6), the part of the global stress that
     /// depends on `x_i`. Non-increasing over [`DwMDS::step`].
     ///
+    /// Writing `ew_ij` for the effective weight of a link (`w_ij` for a peer,
+    /// `2 w_ij` for an anchor)
+    ///
     /// ```text
-    /// S_i = sum_peers   w_ij (delta_ij - d_ij)^2
-    ///     + sum_anchors 2 w_ij (delta_ij - d_ij)^2
+    /// S_i = sum_j ew_ij (delta_ij - d_ij)^2
     ///     + r_i ||x_i - xbar_i||^2
     /// ```
     pub fn cost(&self) -> f32 {
         let mut cost = self.r_i * (self.x_i - self.x_bar).norm_squared();
 
         for n in self.x.values() {
-            if n.w_ij <= 0. {
-                continue;
-            }
-            let residual = n.delta_ij - (self.x_i - n.x_j).norm();
-            cost += n.weight() * residual * residual;
+            let d_ij = (self.x_i - n.x_j).norm();
+            let residual = n.delta_ij - d_ij;
+            cost += n.effective_weight() * residual * residual;
         }
 
         cost
@@ -271,12 +288,16 @@ impl DwMDS {
     /// One SMACOF majorization step. Minimizes the quadratic majorant of the
     /// local cost at the current estimate, which never increases the cost.
     ///
-    /// Writing `c_ij` for the effective weight of a link (`w_ij` for a peer,
-    /// `2 w_ij` for an anchor), paper eq. (13) to (15) expand to
+    /// Writing `ew_ij` for the effective weight of a link (`w_ij` for a peer,
+    /// `2 w_ij` for an anchor), p_ij for the pulling term and c_ij for
+    /// each neighbours effect on the accumulated result,
+    /// paper eq. (13) to (15) expand to
     ///
     /// ```text
-    /// a_i = r_i + sum_j c_ij
-    /// x_i <- (r_i xbar_i + sum_j c_ij (x_j + delta_ij / d_ij (x_i - x_j))) / a_i
+    /// a_i = r_i + sum_j ew_ij
+    /// p_ij = delta_ij / d_ij
+    /// c_ij = ew_ij (x_j + p_ij (x_i - x_j))
+    /// x_i <- (r_i xbar_i + sum_j c_ij) / a_i
     /// ```
     ///
     /// Returns the updated estimate.
@@ -285,24 +306,22 @@ impl DwMDS {
         let mut acc = self.r_i * self.x_bar;
 
         for n in self.x.values() {
-            if n.w_ij <= 0. {
-                continue;
-            }
+            debug_assert!(n.w_ij > 0., "weightless link stored for a neighbour");
 
-            let c_ij = n.weight();
-            a_i += c_ij;
+            let ew_ij = n.effective_weight();
+            a_i += ew_ij;
 
             let offset = self.x_i - n.x_j;
             let d_ij = offset.norm();
             // The pull along the link is zero for coincident estimates, where
             // the direction to pull towards is undefined.
-            let b_ij = if d_ij > f32::EPSILON {
-                c_ij * n.delta_ij / d_ij
+            let p_ij = if d_ij > f32::EPSILON {
+                n.delta_ij / d_ij
             } else {
                 0.
             };
 
-            acc += c_ij * n.x_j + b_ij * offset;
+            acc += ew_ij * (n.x_j + p_ij * offset);
         }
 
         // If enough valuable neighbours are present, update x_i from acc
@@ -383,7 +402,7 @@ mod tests {
         for _ in 0..100 {
             node.step();
             let cost = node.cost();
-            assert!(cost <= previous + 1e-5, "{cost} > {previous}");
+            assert!(cost <= previous + f32::EPSILON, "{cost} > {previous}");
             previous = cost;
         }
     }
@@ -473,7 +492,7 @@ mod tests {
         assert_eq!(node.neighbour_count(), 1);
 
         node.solve();
-        assert!((node.position().x - 4.).abs() < 1e-3, "{}", node.position());
+        assert!((node.position().x - 4.).abs() <= f32::EPSILON, "{}", node.position());
     }
 
     /// Accumulated weight, not just an averaged range: two exchanges pull
@@ -513,7 +532,7 @@ mod tests {
         node.observe_anchor(0, anchor, 5., 1.);
 
         node.solve();
-        assert!((node.position().x - 5.).abs() < 1e-3, "{}", node.position());
+        assert!((node.position().x - 5.).abs() <= f32::EPSILON, "{}", node.position());
     }
 
     #[test]
@@ -534,7 +553,7 @@ mod tests {
         node.solve();
 
         let expected = na::Vector3::new(5. / 3., 2., 3.);
-        assert!((node.position() - expected).norm() < 1e-3, "{}", node.position());
+        assert!((node.position() - expected).norm() <= f32::EPSILON, "{}", node.position());
     }
 
     /// Two unknown nodes localizing each other against a shared anchor set,
@@ -578,8 +597,9 @@ mod tests {
             }
         }
 
-        for (node, expected) in nodes.iter().zip(truth) {
-            assert!((node.position() - expected).norm() < 1e-2);
+        let tolerance = Config::default().tolerance;
+        for (i, (node, expected)) in nodes.iter().zip(truth).enumerate() {
+            assert!((node.position() - expected).norm() <= tolerance, "node {}: {}", i, node.position());
         }
     }
 
@@ -623,7 +643,7 @@ mod tests {
         }
 
         for (i, (node, expected)) in nodes.iter().zip(truth).enumerate() {
-            assert!((node.position() - expected).norm() < noise, "node {}: {}", i, node.position());
+            assert!((node.position() - expected).norm() <= noise, "node {}: {}", i, node.position());
         }
     }
 }
